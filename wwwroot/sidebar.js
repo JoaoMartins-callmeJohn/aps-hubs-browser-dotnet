@@ -19,7 +19,7 @@ async function getHubs() {
 
 async function getProjects(hubId) {
     const projects = await getJSON(`/api/hubs/${hubId}/projects`);
-    return projects.map(project => createTreeNode(`project|${hubId}|${project.id}`, project.attributes.name, 'icon-project', true));
+    return projects.map(project => createTreeNode(`project|${hubId}|${project.id}|${Object.values(project.attributes.scopes).join(',')}`, project.attributes.name, 'icon-project', true));
 }
 
 async function getContents(hubId, projectId, folderId = null) {
@@ -60,7 +60,8 @@ export function initTree(selector, onSelectionChanged) {
         event.preventTreeDefault();
         const tokens = node.id.split('|');
         if (tokens[0] === 'version') {
-            onSelectionChanged(tokens[1]);
+            let projectNode = node.getParents().find(p => p.id.includes('project'));
+            onSelectionChanged(tokens[1], projectNode.id.split('|')[3]);
         }
     });
     return new InspireTreeDOM(tree, { target: selector });

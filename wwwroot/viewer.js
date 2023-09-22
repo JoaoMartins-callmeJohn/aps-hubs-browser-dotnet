@@ -22,7 +22,11 @@ export function initViewer(container) {
     });
 }
 
-export function loadModel(viewer, urn) {
+export function loadModel(viewer, urn, scopes) {
+    //Scopes definitions workaround
+    Autodesk.Viewing.endpoint.addQueryParam('scopes', scopes);
+    Autodesk.Viewing.endpoint.setAcmSession('');
+
     function onDocumentLoadSuccess(doc) {
         viewer.loadDocumentNode(doc, doc.getRoot().getDefaultGeometry());
     }
