@@ -23,9 +23,6 @@ export function initViewer(container) {
 }
 
 export function loadModel(viewer, urn, scopes) {
-    //Scopes definitions workaround
-    Autodesk.Viewing.endpoint.addQueryParam('scopes', scopes);
-    Autodesk.Viewing.endpoint.setAcmSession('');
 
     function onDocumentLoadSuccess(doc) {
         viewer.loadDocumentNode(doc, doc.getRoot().getDefaultGeometry());
@@ -34,5 +31,5 @@ export function loadModel(viewer, urn, scopes) {
         alert('Could not load model. See console for more details.');
         console.error(message);
     }
-    Autodesk.Viewing.Document.load('urn:' + urn, onDocumentLoadSuccess, onDocumentLoadFailure);
+    Autodesk.Viewing.Document.load('urn:' + urn, onDocumentLoadSuccess, onDocumentLoadFailure, { 'x-ads-acm-scopes': scopes, 'x-ads-acm-namespace': 'WIPDM', 'x-ads-acm-check-groups': true });
 }
