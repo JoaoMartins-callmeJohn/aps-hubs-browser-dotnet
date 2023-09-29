@@ -63,4 +63,16 @@ public class HubsController : ControllerBase
         var versions = await _aps.GetVersions(hub, project, item, tokens);
         return JsonConvert.SerializeObject(versions);
     }
+
+    [HttpGet("/downloadsignedurl")]
+    public async Task<ActionResult<string>> DownloadSignedURL(string urn)
+    {
+        var tokens = await AuthController.PrepareTokens(Request, Response, _aps);
+        if (tokens == null)
+        {
+            return Unauthorized();
+        }
+        var downloadURL = await _aps.GetDownloadURL(urn, tokens);
+        return downloadURL;
+    }
 }

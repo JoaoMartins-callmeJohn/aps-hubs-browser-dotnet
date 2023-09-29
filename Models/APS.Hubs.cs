@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Autodesk.Forge;
 using Autodesk.Forge.Model;
+using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 public partial class APS
 {
@@ -68,5 +70,34 @@ public partial class APS
             versions.Add(version.Value);
         }
         return versions;
+    }
+
+    public async Task<string> GetDownloadURL(string urn, Tokens tokens)
+    {
+        string bucketKey = "";
+        string objectName = "";
+        var clientHandler = new HttpClientHandler
+        {
+            UseCookies = false,
+        };
+        var client = new HttpClient(clientHandler);
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = new System.Uri($"https://developer.api.autodesk.com/oss/v2/buckets/{bucketKey}/objects/{objectName}/signeds3download?minutesExpiration=60&="),
+            Headers =
+        {
+            { "Authorization", $"Bearer {tokens.InternalToken}" },
+        },
+        };
+        string signedURL = "";
+        using (var response = await client.SendAsync(request))
+        {
+            response.EnsureSuccessStatusCode();
+            var body = await response.Content.ReadAsStringAsync();
+            JObject jsonBody = JObject.Parse(body);
+            signedURL = jsonBody.SelectToken("url").Value<string>();
+        }
+        return signedURL;
     }
 }
