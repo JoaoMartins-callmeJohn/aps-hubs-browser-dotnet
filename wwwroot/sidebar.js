@@ -35,7 +35,8 @@ async function getContents(hubId, projectId, folderId = null) {
 
 async function getVersions(hubId, projectId, itemId) {
     const versions = await getJSON(`/api/hubs/${hubId}/projects/${projectId}/contents/${itemId}/versions`);
-    return versions.map(version => createTreeNode(`version|${version.id}|${version.relationships.storage.meta.link.href.replace('?','/signeds3download?')}`, version.attributes.createTime, 'icon-version'));
+    let versionsWithStorage = versions.filter(v => !!v.relationships.storage);
+    return versionsWithStorage.map(version => createTreeNode(`version|${version.id}|${version.relationships.storage.meta.link.href.replace('?','/signeds3download?')}`, version.attributes.createTime, 'icon-version'));
 }
 
 export function initTree(selector, onSelectionChanged) {
